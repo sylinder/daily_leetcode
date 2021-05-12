@@ -100,3 +100,49 @@ class Solution {
 }
 ```
 
+
+
+#### 从尾到头打印链表
+
+- **题目**：输入一个链表的头节点，从尾到头反过来返回每个节点的值（用数组返回）。
+- **思路**： 反序打印链表，可以利用栈来实现。递归就是天然的栈结构。
+
+```java
+class Solution {
+    public int[] reversePrint(ListNode head) {
+        Stack<Integer> stack = new Stack<>();
+        while (head != null) {
+            stack.push(head.val);
+            head = head.next;
+        }
+        int[] result = new int[stack.size()];
+        int i = 0;
+        while (!stack.isEmpty()) {
+            result[i++] = stack.pop();
+        }
+        return result;
+    }
+}
+
+
+class Solution {
+    public int[] reversePrint(ListNode head) {
+        List<Integer> list = new ArrayList<>();
+        reversePrint(head, list);
+        int[] result = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            result[i] = list.get(i);
+        }
+        return result;
+    }
+
+    public void reversePrint(ListNode head, List<Integer> list) {
+        if (head == null) {
+            return ;
+        }
+        reversePrint(head.next, list);
+        list.add(head.val);
+    }
+}
+```
+
