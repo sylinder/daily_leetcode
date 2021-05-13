@@ -146,3 +146,74 @@ class Solution {
 }
 ```
 
+
+
+#### 重建二叉树
+
+- **题目**： 输入某二叉树的前序遍历和中序遍历的结果，请重建该二叉树。假设输入的前序遍历和中序遍历的结果中都不含重复的数字。
+- **思路**： 前序遍历的第一个值就是根结点，而在中序遍历中，根结点的位置将二叉树分为左右两颗子树。因此可以根据根结点的位置计算出左子树和右子树结点的个数，将前序遍历和中序遍历数组分成左右子树两半，然后再递归生成二叉树即可。
+
+```java
+class Solution {
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        return buildTree(preorder, inorder, 0, preorder.length - 1, 0, inorder.length - 1);
+    }
+
+    public TreeNode buildTree(int[] preorder, int[] inorder, int preStart, int preEnd, int inStart, int inEnd) {
+        if (preStart > preEnd) {
+            return null;
+        }
+        TreeNode root = new TreeNode(preorder[preStart]);
+        int index = findIndex(inorder, preorder[preStart], inStart, inEnd);
+        int lenOfLeft = index - inStart;
+        root.left = buildTree(preorder, inorder, preStart + 1, preStart + lenOfLeft, inStart, index - 1);
+        root.right = buildTree(preorder, inorder, preStart + lenOfLeft + 1, preEnd, index + 1, inEnd);
+        return root;
+    }
+    public int findIndex(int[] arr, int target, int start, int end) {
+        for (int i = start; i <= end; i++) {
+            if (arr[i] == target) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}
+```
+
+
+
+#### 重建二叉树Ⅱ
+
+- **题目**： 输入某二叉树的后序遍历和中序遍历的结果，请重建该二叉树。
+- **思路**： 与上一题类似，只是后序遍历根节点的值在数组的最后一位。
+
+```java
+class Solution {
+    public TreeNode buildTree(int[] inorder, int[] postorder) {
+        return buildTree(inorder, postorder, 0, inorder.length - 1, 0, postorder.length - 1);
+    }
+
+    public TreeNode buildTree(int[] inorder, int[] postorder, int inStart, int inEnd, int postStart, int postEnd) {
+        if (inStart > inEnd) {
+            return null;
+        }
+        TreeNode root = new TreeNode(postorder[postEnd]);
+        int index = findIndex(inorder, inStart, inEnd, postorder[postEnd]);
+        int lenOfLeft = index - inStart;
+        root.left = buildTree(inorder, postorder, inStart, index - 1, postStart, postStart + lenOfLeft - 1);
+        root.right = buildTree(inorder, postorder, index + 1, inEnd, postStart + lenOfLeft, postEnd - 1);
+        return root;
+    }
+
+    public int findIndex(int[] arr, int start, int end, int target) {
+        for (int i = start; i <= end; i++) {
+            if (arr[i] == target) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}
+```
+
