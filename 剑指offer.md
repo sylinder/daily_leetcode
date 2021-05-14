@@ -217,3 +217,35 @@ class Solution {
 }
 ```
 
+
+
+#### 二叉树的下一个节点
+
+- **题目**：给定一个二叉树其中的一个结点，请找出中序遍历顺序的下一个结点并且返回。注意，树中的结点不仅包含左右子结点，同时包含指向父结点的next指针。
+- **思路**： 二叉树中序遍历中某个节点的下一个节点，存在三种情况： 1）该节点存在右子树，则下一个节点就是右子树中最左边的节点； 2）该节点不存在右子树，但是该节点是其父节点的左子节点，这时候父节点就是下一个节点； 3）该节点不存在右子树，并且该节点是其父节点的右子节点，那么下一个节点只能顺着根节点去找，直到找到某个父节点是爷节点的左子节点，或者找不到返回null。  （2和3可以统一处理）
+
+```java
+public class Solution {
+    public TreeLinkNode GetNext(TreeLinkNode pNode) {
+        if (pNode == null) {
+            return null;
+        }
+        if (pNode.right != null) {
+            TreeLinkNode cur = pNode.right;
+            while (cur.left != null) {
+                cur = cur.left;
+            }
+            return cur;
+        }
+        TreeLinkNode cur = pNode;
+        while (cur.next != null) {
+            if (cur.next.left == cur) {
+                return cur.next;
+            }
+            cur = cur.next;
+        }
+        return null;
+    }
+}
+```
+
