@@ -249,3 +249,151 @@ public class Solution {
 }
 ```
 
+
+
+#### 用两个栈实现队列
+
+- **题目**： 用两个栈实现一个队列。队列的声明如下，请实现它的两个函数 appendTail 和 deleteHead ，分别完成在队列尾部插入整数和在队列头部删除整数的功能。(若队列中没有元素，deleteHead 操作返回 -1 )
+- **思路**： 队列先进先出，栈后进先出，完全相反，怎么才能让两个栈实现队列的功能呢？负负得正。先将数据加入第一个栈中，然后从第一个栈再加入第二个栈中，这样就可以实现先进先出的功能了。但是需要注意的是，从第一个栈加入第二个栈的时机，如果第二个栈里面有数据（先进的），此时加入则会使得第二个栈中原本先进来的数据后面才出。因此，需要在第二个栈为空时才将第一个栈的数据全部加入第二个栈中。
+
+```java
+class CQueue {
+    private Stack<Integer> stack1;
+    private Stack<Integer> stack2;
+
+    public CQueue() {
+        stack1 = new Stack<>();
+        stack2 = new Stack<>();
+    }
+    
+    public void appendTail(int value) {
+        stack1.push(value);
+    }
+    
+    public int deleteHead() {
+        if (!stack2.isEmpty()) {
+            return stack2.pop();
+        }
+        while (!stack1.isEmpty()) {
+            stack2.push(stack1.pop());
+        }
+        return stack2.isEmpty() ? -1 : stack2.pop();
+    }
+}
+```
+
+
+
+#### 用队列实现栈
+
+- **题目**： 请你仅使用两个队列实现一个后入先出（LIFO）的栈，并支持普通队列的全部四种操作（`push`、`top`、`pop` 和 `empty`）。
+- **思路**： 申请两个队列，queue1 保持空的状态，queue2 假设维护着后进先出的顺序，此时push操作只需要加入到queue1中，然后再将queue2中的所有元素都加入queue2中，即可保证此时的queue1中的顺序就是后进先出的顺序。再将queue1和queue2交换，让queue1继续处理push操作，queue2维持后进先出的顺序。而queue2中的顺序，我们一开始就维护好即可。
+
+```java
+class MyStack {
+
+    private Queue<Integer> queue1;
+    private Queue<Integer> queue2;
+
+    /** Initialize your data structure here. */
+    public MyStack() {
+        queue1 = new LinkedList<>();
+        queue2 = new LinkedList<>();
+    }
+    
+    /** Push element x onto stack. */
+    public void push(int x) {
+        queue1.add(x);
+        while (!queue2.isEmpty()) {
+            queue1.add(queue2.poll());
+        }
+        Queue<Integer> temp = queue1;
+        queue1 = queue2;
+        queue2 = temp;
+    }
+    
+    /** Removes the element on top of the stack and returns that element. */
+    public int pop() {
+        return empty() ? -1 : queue2.poll();
+    }
+    
+    /** Get the top element. */
+    public int top() {
+        return empty() ? -1 : queue2.peek();
+    }
+    
+    /** Returns whether the stack is empty. */
+    public boolean empty() {
+        return queue2.isEmpty();
+    }
+}
+```
+
+
+
+#### 包含min函数的栈
+
+- **题目**： 定义栈的数据结构，请在该类型中实现一个能够得到栈的最小元素的 min 函数在该栈中，调用 min、push 及 pop 的时间复杂度都是 O(1)。
+- **思路**： 在结构内部定义两个栈，dataStack用来正常保存push进来的数据，minStack用来保存当前栈中的最小值。当push的时候，如果minStack为空
+- 或者minStack的栈顶元素比push进来的数x要小，则将x 加入到同时加入dataStack和 minStack中，否则将x插入dataStack，而将minStack的栈顶元素再次加入minStack中。pop的时候同时将dataStack和minStack中的元素pop出来即可。
+
+```java
+class MinStack {
+    private Stack<Integer> dataStack;
+    private Stack<Integer> minStack;
+
+    /** initialize your data structure here. */
+    public MinStack() {
+        dataStack = new Stack<>();
+        minStack = new Stack<>();
+    }
+    
+    public void push(int x) {
+        if (minStack.isEmpty() || minStack.peek() > x) {
+            minStack.push(x);
+        } else {
+            minStack.push(minStack.peek());
+        }
+        dataStack.push(x);
+    }
+    
+    public void pop() {
+        dataStack.pop();
+        minStack.pop();
+    }
+    
+    public int top() {
+        return dataStack.peek();
+    }
+    
+    public int min() {
+        return minStack.peek();
+    }
+}
+```
+
+
+
+#### 栈的压入、弹出序列
+
+- **题目**： 输入两个整数序列，第一个序列表示栈的压入顺序，请判断第二个序列是否为该栈的弹出顺序。假设压入栈的所有数字均不相等。例如，序列 {1,2,3,4,5} 是某栈的压栈序列，序列 {4,5,3,2,1} 是该压栈序列对应的一个弹出序列，但 {4,3,5,1,2} 就不可能是该压栈序列的弹出序列。
+- **思路**： 用两个序列来模拟入栈和出栈的过程。将pushed数组中的元素分别压入栈中，然后判断栈顶元素是否等于popped数组的下标index，如果相等，则将栈顶元素出栈并将index加一。最后判断栈是否为空即可。
+
+```java
+class Solution {
+    public boolean validateStackSequences(int[] pushed, int[] popped) {
+        Stack<Integer> stack = new Stack<>();
+        int pushedIndex = 0;
+        int poppedIndex = 0;
+        while (pushedIndex < pushed.length) {
+            stack.push(pushed[pushedIndex++]);
+            while (!stack.isEmpty() && stack.peek() == popped[poppedIndex]) {
+                stack.pop();
+                poppedIndex++;
+            }
+        }
+        return stack.isEmpty();
+    }
+}
+```
+
