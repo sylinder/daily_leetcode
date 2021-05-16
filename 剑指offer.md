@@ -397,3 +397,106 @@ class Solution {
 }
 ```
 
+
+
+#### 斐波那契数列
+
+- **题目**： 写一个函数，输入 `n` ，求斐波那契（Fibonacci）数列的第 `n` 项（即 `F(N)`）。斐波那契数列的定义如下：
+
+  ```java
+  F(0) = 0,   F(1) = 1
+  F(N) = F(N - 1) + F(N - 2), 其中 N > 1.
+  ```
+
+  斐波那契数列由 0 和 1 开始，之后的斐波那契数就是由之前的两数相加而得出。答案需要取模 1e9+7（1000000007）。
+
+- **思路**： 如果暴力解决，即 fib = fib (n - 1) + fib (n - 2)，将会严重超时。主要是因为会存在很多很多重复的计算。比如，暴力法在计算 fib(8) 时，会计算 fib(7) 和 fib(6)，而 fib(7) 会计算 fib(6) 和 f(5)……在整个计算的过程当中，f(6)计算了2次，f(5)计算了3次，f(4)计算了5次…… 随着n的增长，时间复杂度将会以指数的方式增长……
+
+  动态规划的解法： fib(n)只与 fib(n - 1) 和 fib(n - 2)有关，而 fib(n - 1) 只与 fib(n - 2) 和 fib(n - 3) 有关……只要自底向上地保存前面计算的两个数，那么计算 fib (n) 只需要简单的加法即可。状态转移方程题目已经给出。
+
+```java
+class Solution {
+    public int fib(int n) {
+        if (n <= 1) {
+            return n;
+        }
+        int first = 0;
+        int second = 1;
+        int result = 0;
+        for (int i = 2; i <= n; i++) {
+            result = (first + second) % 1000000007; //题目要求取余，否则会有溢出
+            first = second;
+            second = result;
+        }
+        return second;
+    }
+}
+```
+
+
+
+#### 青蛙跳台阶问题Ⅰ
+
+- **题目**： 一只青蛙一次可以跳上1级台阶，也可以跳上2级台阶。求该青蛙跳上一个 `n` 级的台阶总共有多少种跳法。答案需要取模 1e9+7（1000000007），如计算初始结果为：1000000008，请返回 1。
+- **思路**： 跳上n级的台阶，可以从 n - 1 和 n - 2 这两级台阶跳上去。即 `F(n) = F(n - 1) + F(n - 2)`。 这其实就是一个斐波那契数列。
+
+```java
+class Solution {
+    public int numWays(int n) {
+        if (n <= 1) {
+            return 1; 
+        }
+        int first = 1;
+        int second = 1;
+        int result = 0;
+        for (int i = 2; i <= n; i++) {
+            result = (first + second) % 1000000007;
+            first = second;
+            second = result;
+        }
+        return result;
+    }
+}
+```
+
+
+
+#### 青蛙跳台阶问题Ⅱ
+
+- **题目**： 一只青蛙一次可以跳上1级台阶，可以跳上2级台阶……也可以跳上n级台阶。求该青蛙跳上一个 `n` 级的台阶总共有多少种跳法。
+- 思路： 跳上n级台阶，可以从第 n - 1 级、第 n - 2 级 、…… 、第0级跳上去。因此状态转移方程为： `F(n) = F(n - 1) + F(n - 2) + ... + F(0)` ，然后 `F(n - 1) = F(n - 2) + F(n - 3) + ... + F(0)`， 可以发现，`F(n) = 2F(n - 1) = 4 F(n - 2) = ... `而`F(0) = F(1) = 1`。最终可得F(n) 等于2的(n-1)次方。用位运算表示即： 2 左移 n - 1 位。
+
+```java
+public class Solution {
+    public int jumpFloorII(int target) {
+        return 1 << (target - 1);
+    }
+}
+```
+
+
+
+#### 矩形覆盖
+
+- **题目**： 我们可以用2 * 1的小矩形横着或者竖着去覆盖更大的矩形。请问用n个2 * 1的小矩形无重叠地覆盖一个2 * n的大矩形，总共有多少种方法？
+- **思路**： 对于一个 2 * n 的大矩形，假设完全覆盖的方法有 F(n) 种，而最左边可以有两种放置方式：竖着放和横着放。竖着放的时候，右边还有 n - 1 个空位； 横着放在左上角的时候，左下角也必须横着放一个 2 * 1的小矩形，而此时右边还有 n - 2 个空位。即 `F(n) = F(n - 1) + F(n - 2)` 。这其实也是一个斐波那契数列。
+
+```java
+public class Solution {
+    public int rectCover(int target) {
+        if (target <= 2) {
+            return target;
+        }
+        int first = 1;
+        int second = 2;
+        int result = 0;
+        for (int i = 3; i <= target; i++) {
+            result = first + second;
+            first = second;
+            second = result;
+        }
+        return result;
+    }
+}
+```
+
