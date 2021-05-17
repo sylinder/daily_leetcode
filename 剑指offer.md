@@ -410,7 +410,7 @@ class Solution {
 
   斐波那契数列由 0 和 1 开始，之后的斐波那契数就是由之前的两数相加而得出。答案需要取模 1e9+7（1000000007）。
 
-- **思路**： 如果暴力解决，即 fib = fib (n - 1) + fib (n - 2)，将会严重超时。主要是因为会存在很多很多重复的计算。比如，暴力法在计算 fib(8) 时，会计算 fib(7) 和 fib(6)，而 fib(7) 会计算 fib(6) 和 f(5)……在整个计算的过程当中，f(6)计算了2次，f(5)计算了3次，f(4)计算了5次…… 随着n的增长，时间复杂度将会以指数的方式增长……
+- **思路**： 如果暴力解决，即 fib = fib (n - 1) + fib (n - 2)，将会严重超时。主要是因为会存在很多很多重复的计算(很多重复的子树）。比如，暴力法在计算 fib(8) 时，会计算 fib(7) 和 fib(6)，而 fib(7) 会计算 fib(6) 和 f(5)……在整个计算的过程当中，f(6)计算了2次，f(5)计算了3次，f(4)计算了5次…… 随着n的增长，时间复杂度将会以指数的方式增长……
 
   动态规划的解法： fib(n)只与 fib(n - 1) 和 fib(n - 2)有关，而 fib(n - 1) 只与 fib(n - 2) 和 fib(n - 3) 有关……只要自底向上地保存前面计算的两个数，那么计算 fib (n) 只需要简单的加法即可。状态转移方程题目已经给出。
 
@@ -496,6 +496,36 @@ public class Solution {
             second = result;
         }
         return result;
+    }
+}
+```
+
+
+
+#### 旋转数组的最小数字
+
+- **题目**： 把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。输入一个递增排序的数组的一个旋转，输出旋转数组的最小元素。例如，数组 [3,4,5,1,2] 为 [1,2,3,4,5] 的一个旋转，该数组的最小值为1。
+- **思路**： 有序数组的查找，那肯定是二分了。旋转数组分为前后两部分有序数组，前面那部分大于或等于后面那部分，因此在使用二分法的时候，可以将中间的元素 mid 和数组的最后一个元素high 相比，如果比high大，那么说明mid在前面一半，最小值在mid的右边；如果比high小，那说明最小值在左手边或者是mid自己；如果mid和high相等，那什么可能都有，只能一个一个遍历了。
+
+```java
+class Solution {
+    public int minArray(int[] numbers) {
+        if (numbers == null || numbers.length == 0) {
+            return -1;
+        }
+        int low = 0;
+        int high = numbers.length - 1;
+        while (low < high) {
+            int mid = low + (high - low) / 2;
+            if (numbers[mid] > numbers[high]) {
+                low =  mid + 1;
+            } else if (numbers[mid] < numbers[high]) {
+                high = mid;
+            } else {
+                high--;
+            }
+        }
+        return numbers[low];
     }
 }
 ```
