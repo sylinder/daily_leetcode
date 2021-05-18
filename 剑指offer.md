@@ -530,3 +530,70 @@ class Solution {
 }
 ```
 
+
+
+#### 矩阵中的路径
+
+- **题目**： 给定一个 m x n 二维字符网格 board 和一个字符串单词 word 。如果 word 存在于网格中，返回 true ；否则，返回 false 。
+
+  单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母不允许被重复使用。
+
+- **思路**： 回溯法。使用回溯法，首先要搞清楚三件事：1）可以选择的列表。 2）已经选择的列表。 3）结束条件。 对于可以选择的列表，当已经选择了某一个值的时候，此时的选择列表中有上下左右四个选项了（并且选项中未被访问过）； 对于已经选择的列表，那就是找到了word字符串的前面几个，用一个int下标表示即可； 对于结束条件，在board中找到word字符串即可（即已选择的列表中的下标等于word的长度）。 明确了这三点，然后套用回溯法的框架即可，剩下的就交给递归解决了。
+
+```java
+void backtrack(selectedPath, selectOptions) {
+    if (satisfied) {
+        result.add();
+        return;
+    }
+    for (option : selectOptions) {
+        choose(option); // selectedPath.add(option)
+        backtrack(selectedPath, selectOptions);
+        popOption(option); // delete this option and choose another
+    }
+}
+```
+
+
+
+```java
+class Solution {
+    public boolean exist(char[][] board, String word) {
+        if (board == null || board.length == 0 || word == null) {
+            return false;
+        }
+        int row = board.length;
+        int col = board[0].length;
+        boolean[][] visited = new boolean[row][col];
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (backtrack(board, i, j, word, 0, visited)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean backtrack(char[][] board, int i, int j, String word, int pathLen, boolean[][] visited) {
+        if (pathLen == word.length()) {
+            return true;
+        }
+        boolean hasPath = false;
+        if (i >= 0 && i < board.length && j >= 0 && j < board[0].length && !visited[i][j] && board[i][j] == word.charAt(pathLen)) {
+            pathLen++;
+            visited[i][j] = true;
+            
+            hasPath = backtrack(board, i - 1, j, word, pathLen, visited) ||
+                      backtrack(board, i + 1, j, word, pathLen, visited) || 
+                      backtrack(board, i, j - 1, word, pathLen, visited) || 
+                      backtrack(board, i, j + 1, word, pathLen, visited);
+            
+            pathLen--;
+            visited[i][j] = false;
+        }
+        return hasPath;
+    }
+}
+```
+
