@@ -597,3 +597,48 @@ class Solution {
 }
 ```
 
+
+
+#### 机器人的活动范围
+
+- **题目**： 地上有一个m行n列的方格，从坐标 [0,0] 到坐标 [m-1,n-1] 。一个机器人从坐标 [0, 0] 的格子开始移动，它每次可以向左、右、上、下移动一格（不能移动到方格外），也不能进入行坐标和列坐标的数位之和大于k的格子。例如，当k为18时，机器人能够进入方格 [35, 37] ，因为3+5+3+7=18。但它不能进入方格 [35, 38]，因为3+5+3+8=19。请问该机器人能够到达多少个格子？
+- **思路**： 回溯法。
+  - 可以选择的列表：机器人站在某个方格内，可以往上下左右四个方向走。（如果没访问过的话）
+  - 已经选择的列表： 用一个二维布尔数组来表示，true表示访问过，false表示还没访问过。
+  - 结束条件或者满足条件：行坐标和列坐标的数位之和不大于k即可。
+
+```java
+class Solution {
+    private int result = 0;
+
+    public int movingCount(int m, int n, int k) {
+        if (m <= 0 || n <= 0) {
+            return result;
+        }
+        boolean[][] visited = new boolean[m][n];
+        backtrack(m, n, 0, 0, k, visited);
+        return result;
+    }
+
+    private void backtrack(int row, int col, int i, int j, int k, boolean[][] visited) {
+        if (i >= 0 && i < row && j >= 0 && j < col && !visited[i][j] && getDigit(i) + getDigit(j) <= k) {
+            result++;
+            visited[i][j] = true;
+            backtrack(row, col, i - 1, j, k, visited);
+            backtrack(row, col, i + 1, j, k, visited);
+            backtrack(row, col, i, j - 1, k, visited);
+            backtrack(row, col, i, j + 1, k, visited);
+        }
+    }
+
+    private int getDigit(int num) {
+        int sum = 0;
+        while (num > 0) {
+            sum += num % 10;
+            num /= 10;
+        }
+        return sum;
+    } 
+}
+```
+
