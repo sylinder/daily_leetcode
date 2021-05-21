@@ -680,3 +680,54 @@ class Solution {
 }
 ```
 
+
+
+#### 二进制中1的个数
+
+- **题目**： 请实现一个函数，输入一个整数（以二进制串形式），输出该数二进制表示中 1 的个数。例如，把 9 表示成二进制是 1001，有 2 位是 1。因此，如果输入 9，则该函数输出 2。
+- **思路**： 略。
+
+```java
+public class Solution {
+    // you need to treat n as an unsigned value
+    public int hammingWeight(int n) {
+        int result = 0;
+        while (n != 0) {
+            result += n & 1;
+            n >>>= 1;
+        }
+        return result;
+    }
+}
+```
+
+
+
+#### 删除链表的节点
+
+- **题目**： 给定单向链表的头指针和一个要删除的节点的值，定义一个函数删除该节点。
+
+  返回删除后的链表的头节点。
+
+- **思路**： 略。
+
+```java
+class Solution {
+    public ListNode deleteNode(ListNode head, int val) {
+        ListNode dummy = new ListNode(-1);
+        dummy.next = head;
+        ListNode cur = dummy;
+        while (cur.next != null) {
+            if (cur.next.val == val) {
+                cur.next = cur.next.next;
+                break;
+            }
+            cur = cur.next;
+        }
+        return dummy.next;
+    }
+}
+```
+
+
+
