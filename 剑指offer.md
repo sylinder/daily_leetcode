@@ -731,3 +731,36 @@ class Solution {
 
 
 
+#### 调整数组顺序使奇数位于偶数前面
+
+- **题目**： 输入一个整数数组，实现一个函数来调整该数组中数字的顺序，使得所有奇数位于数组的前半部分，所有偶数位于数组的后半部分。
+- **思路**： 双指针，前面一个low，后面一个high。low一直往后走，直到遇到偶数； high一直往前走，直到遇到奇数，交换两个值；然后重复上面的过程，直到low遇见high。
+
+```java
+class Solution {
+    public int[] exchange(int[] nums) {
+        if (nums == null || nums.length < 2) {
+            return nums;
+        }
+        int low = 0;
+        int high = nums.length - 1;
+        while (low < high) {
+            while (low < high && nums[low] % 2 == 1) {
+                low++;
+            }
+            while (low < high && nums[high] % 2 == 0) {
+                high--;
+            }
+            swap(nums, low, high);
+        }
+        return nums;
+    }
+
+    private void swap(int[] nums, int i, int j) {
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+}
+```
+
