@@ -794,3 +794,59 @@ class Solution {
 }
 ```
 
+
+
+#### 反转链表
+
+- **题目**： 定义一个函数，输入一个链表的头节点，反转该链表并输出反转后链表的头节点。
+- **思路**： 略。
+
+```java
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        ListNode cur = head;
+        ListNode pre = null;
+        while (cur != null) {
+            ListNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
+}
+```
+
+
+
+#### 合并两个排序的链表
+
+- **题目**： 输入两个递增排序的链表，合并这两个链表并使新链表中的节点仍然是递增排序的。
+- **思路**： 略。
+
+```java
+class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode dummy = new ListNode(-1);
+        ListNode cur = dummy;
+        while (l1 != null && l2 != null) {
+            if (l1.val < l2.val) {
+                cur.next = l1;
+                l1 = l1.next;
+            } else {
+                cur.next = l2;
+                l2 = l2.next;
+            }
+            cur = cur.next;
+        }
+        if (l1 != null) {
+            cur.next = l1;
+        }
+        if (l2 != null) {
+            cur.next = l2;
+        }
+        return dummy.next;
+    }
+}
+```
+
