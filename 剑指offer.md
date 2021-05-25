@@ -850,3 +850,89 @@ class Solution {
 }
 ```
 
+
+
+
+
+#### 二叉树的镜像
+
+- **题目**： 请完成一个函数，输入一个二叉树，该函数输出它的镜像。
+- **思路**： 从根节点开始，每个节点需要做的就是交换左右子树，然后递归处理左右子树即可。
+
+```java
+class Solution {
+    public TreeNode mirrorTree(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        TreeNode temp = root.left;
+        root.left = root.right;
+        root.right = temp;
+        mirrorTree(root.left);
+        mirrorTree(root.right);
+        return root;
+    }
+}
+```
+
+
+
+#### 对称的二叉树
+
+- **题目**： 请实现一个函数，用来判断一棵二叉树是不是对称的。如果一棵二叉树和它的镜像一样，那么它是对称的。
+- **思路**： 略。
+
+```java
+class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        if (root == null) {
+            return true;
+        }
+        return isSymmetric(root.left, root.right);
+    }
+
+    public boolean isSymmetric(TreeNode left, TreeNode right) {
+        if (left == null && right == null) {
+            return true;
+        }
+        if (left == null || right == null) {
+            return false;
+        }
+        if (left.val != right.val) {
+            return false;
+        }
+        return isSymmetric(left.left, right.right) && isSymmetric(left.right, right.left);
+    }
+}
+```
+
+
+
+#### 数组中出现次数超过一半的数字
+
+- **题目**： 数组中有一个数字出现的次数超过数组长度的一半，请找出这个数字。
+- **思路**： 略。
+
+```java
+class Solution {
+    public int majorityElement(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return -1;
+        }
+        int result = nums[0];
+        int times = 1;
+        for (int i = 1; i < nums.length; i++) {
+            if (times == 0) {
+                result = nums[i];
+                times = 1;
+            } else if (result == nums[i]) {
+                times++;
+            } else {
+                times--;
+            }
+        }
+        return result;
+    }
+}
+```
+
