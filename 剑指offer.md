@@ -936,3 +936,170 @@ class Solution {
 }
 ```
 
+
+
+#### 树的子结构
+
+- **题目**： 输入两棵二叉树A和B，判断B是不是A的子结构。(约定空树不是任意一个树的子结构)
+
+  B是A的子结构， 即 A中有出现和B相同的结构和节点值。
+
+- **思路**： 遍历二叉树A，在A中找与B根节点值相等的节点，然后判断这些节点的子树是否包含B即可。
+
+```java
+class Solution {
+    public boolean isSubStructure(TreeNode A, TreeNode B) {
+        boolean result = false;
+        if (A != null && B != null) {
+            if (A.val == B.val) {
+                result = hasSubTree(A, B);
+            }
+            if (!result) {
+                result = isSubStructure(A.left, B);
+            }
+            if (!result) {
+                result = isSubStructure(A.right, B);
+            }
+        }
+        return result;
+    }
+
+    private boolean hasSubTree(TreeNode A, TreeNode B) {
+        if (B == null) {
+            return true;
+        }
+        if (A == null) {
+            return false;
+        }
+        if (A.val != B.val) {
+            return false;
+        }
+        return hasSubTree(A.left, B.left) && hasSubTree(A.right, B.right);
+    }
+}
+```
+
+
+
+
+
+#### 从上到下打印二叉树Ⅰ
+
+- **题目**： 从上到下打印出二叉树的每个节点，同一层的节点按照从左到右的顺序打印。
+- **思路**： 二叉树的层次遍历。
+
+```java
+class Solution {
+    public int[] levelOrder(TreeNode root) {
+        if (root == null) {
+            return new int[]{};
+        }
+        List<Integer> list = new ArrayList<>();
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            TreeNode cur = queue.poll();
+            list.add(cur.val);
+            if (cur.left != null) {
+                queue.offer(cur.left);
+            }
+            if (cur.right != null) {
+                queue.offer(cur.right);
+            }
+        }
+        int[] result = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            result[i] = list.get(i);
+        }
+        return result;
+    }
+}
+```
+
+
+
+#### 从上到下打印二叉树Ⅱ
+
+- **题目**： 从上到下按层打印二叉树，同一层的节点按从左到右的顺序打印，每一层打印到一行。
+- **思路**： 略。
+
+```java
+class Solution {
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> result = new ArrayList<>();
+        if (root == null) {
+            return result;
+        }
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            List<Integer> temp = new ArrayList<>();
+            while (size-- > 0) {
+                TreeNode cur = queue.poll();
+                temp.add(cur.val);
+                if (cur.left != null) {
+                    queue.offer(cur.left);
+                }
+                if (cur.right != null) {
+                    queue.offer(cur.right);
+                }
+            }
+            result.add(temp);
+        }
+        return result;
+    }
+}
+```
+
+
+
+#### 从上到下打印二叉树Ⅲ
+
+- **题目**： 请实现一个函数按照之字形顺序打印二叉树，即第一行按照从左到右的顺序打印，第二层按照从右到左的顺序打印，第三行再按照从左到右的顺序打印，其他行以此类推。
+- **思路**： 略。
+
+```java
+class Solution {
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> result = new ArrayList<>();
+        if (root == null) {
+            return result;
+        }
+        Stack<TreeNode> stack1 = new Stack<>();
+        Stack<TreeNode> stack2 = new Stack<>();
+        stack1.push(root);
+        int level = 1;
+        while (!stack1.isEmpty() || !stack2.isEmpty()) {
+            List<Integer> temp = new ArrayList<>();
+            if (level % 2 == 1) {
+                while (!stack1.isEmpty()) {
+                    TreeNode cur = stack1.pop();
+                    temp.add(cur.val);
+                    if (cur.left != null) {
+                        stack2.push(cur.left);
+                    }
+                    if (cur.right != null) {
+                        stack2.push(cur.right);
+                    }
+                }
+            } else {
+                while (!stack2.isEmpty()) {
+                    TreeNode cur = stack2.pop();
+                    temp.add(cur.val);
+                    if (cur.right != null) {
+                        stack1.push(cur.right);
+                    }
+                    if (cur.left != null) {
+                        stack1.push(cur.left);
+                    }
+                }
+            }
+            level++;
+            result.add(temp);
+        }
+        return result;
+    }
+}
+```
+
