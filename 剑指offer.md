@@ -1103,3 +1103,45 @@ class Solution {
 }
 ```
 
+
+
+#### 二叉搜索树的后序遍历序列
+
+- **题目**： 输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历结果。如果是则返回 `true`，否则返回 `false`。假设输入的数组的任意两个数字都互不相同。
+- **思路**： 根据二叉搜索树的特点，在数组中找到第一个比根节点rootValue大的值，然后将数组分成两半，前面一半必须小于rootValue，后面一半必须大于rootValue。前面一半小于rootValue在遍历查找的时候已经比较过了，所以只需要检查后面那一半是否都大于rootValue即可。如果都有小于rootValue的，那就说明这个不是BST的后序遍历，否则，递归调用左右两半即可。
+
+```java
+class Solution {
+    public boolean verifyPostorder(int[] postorder) {
+        if (postorder == null || postorder.length <= 1) {
+            return true;
+        }
+        return postorder(postorder, 0, postorder.length - 1);
+    }
+
+    private boolean postorder(int[] nums, int start, int end) {
+        if (start >= end) {
+            return true;
+        }
+        int rootValue = nums[end];
+        int index = start;
+        while (nums[index] < rootValue) {
+            index++;
+        }
+        if (!isValid(nums, index, end - 1, rootValue)) {
+            return false;
+        }
+        return postorder(nums, start, index - 1) && postorder(nums, index, end - 1);
+    }
+
+    private boolean isValid(int[] nums, int start, int end, int value) {
+        for (int i = start; i <= end; i++) {
+            if (nums[i] < value) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
