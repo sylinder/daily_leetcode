@@ -1145,3 +1145,83 @@ class Solution {
 }
 ```
 
+
+
+#### 二叉树中和为某一值的路劲
+
+- **题目**： 输入一棵二叉树和一个整数，打印出二叉树中节点值的和为输入整数的所有路径。从树的根节点开始往下一直到叶节点所经过的节点形成一条路径。
+- **思路**： 因为要求路径和等于某个值，所以从根节点到叶子节点需要记录路径和的值，并且需要记录整条路径的所有节点值。因此对于某个节点来说，需要做的事情是：接收父节点传下来的路径和记录已经走过路径节点值的list，然后将自己的值加入期中。如果此节点是叶子节点并且刚好路径和为target，那么就将其加入结果中。当离开该节点时，需要将其从路径和路径和中删除。
+
+```java
+class Solution {
+    private List<List<Integer>> result = new LinkedList<>();
+
+    public List<List<Integer>> pathSum(TreeNode root, int target) {
+        if (root == null) {
+            return result;
+        }
+        LinkedList<Integer> list = new LinkedList<>();
+        pathSum(root, target, list);
+        return result;
+    }
+
+    public void pathSum(TreeNode root, int target, LinkedList<Integer> list) {
+        if (root == null) {
+            return ;
+        }
+        target -= root.val;
+        list.addLast(root.val);
+        if (root.left == null && root.right == null && target == 0) {
+            result.add(new LinkedList(list));
+        }
+        pathSum(root.left, target, list);
+        pathSum(root.right, target, list);
+        target += root.val;
+        list.removeLast();
+    }
+}
+```
+
+
+
+#### 复杂链表的复制
+
+- **题目**： 请实现 copyRandomList 函数，复制一个复杂链表。在复杂链表中，每个节点除了有一个 next 指针指向下一个节点，还有一个 random 指针指向链表中的任意节点或者 null。
+- **思路**： 在原链表的每个节点后面插入一个新的copy节点，然后再将每个copy节点的random指针都指向对应的位置（原来节点的random指针的下一个节点），最后将链表分开即可。
+
+```java
+class Solution {
+    public Node copyRandomList(Node head) {
+       if (head == null) {
+           return head;
+       } 
+       Node cur = head;
+       while (cur != null) {
+           Node next = cur.next;
+           cur.next = new Node(cur.val);
+           cur.next.next = next;
+           cur = next;
+       }
+       cur = head;
+       while (cur != null) {
+           Node copy = cur.next;
+           if (cur.random != null) {
+               copy.random = cur.random.next;
+           }
+           cur = copy.next;
+       }
+       cur = head;
+       Node result = head.next;
+       while (cur != null) {
+           Node copy = cur.next;
+           cur.next = copy.next;
+           if (cur.next != null) {
+               copy.next = cur.next.next;
+           }
+           cur = cur.next;
+       }
+       return result;
+    }
+}
+```
+
