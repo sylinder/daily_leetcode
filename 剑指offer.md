@@ -1225,3 +1225,45 @@ class Solution {
 }
 ```
 
+
+
+#### 序列化二叉树
+
+- **题目**： 请实现两个函数，分别用来序列化和反序列化二叉树。
+- **思路**： 略。
+
+```java
+public class Codec {
+
+    private int index = 0;
+
+    // Encodes a tree to a single string.
+    public String serialize(TreeNode root) {
+        if (root == null) {
+            return "#,";
+        }
+        String str = root.val + ",";
+        str += serialize(root.left);
+        str += serialize(root.right);
+        return str;
+    }
+
+    // Decodes your encoded data to tree.
+    public TreeNode deserialize(String data) {
+        String[] strs = data.split(",");
+        return deserialize(strs);
+    }
+
+    private TreeNode deserialize(String[] strs) {
+        String str = strs[index++];
+        if (str.equals("#")) {
+            return null;
+        }
+        TreeNode root = new TreeNode(Integer.parseInt(str));
+        root.left = deserialize(strs);
+        root.right = deserialize(strs);
+        return root;
+    }
+}
+```
+
