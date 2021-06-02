@@ -1267,3 +1267,185 @@ public class Codec {
 }
 ```
 
+
+
+#### 字符串的排列
+
+- **题目**： 输入一个字符串，打印出该字符串中字符的所有排列。你可以以任意顺序返回这个字符串数组，但里面不能有重复元素。
+- **思路**：回溯法。
+  - 已经选择的列表：已经选了第几个，可用一个StringBuilder或者list来记录。
+  - 可选择的列表：除了已经选的那些。
+  - 结束条件：选完了所有字符，即字符串的长度等于sb的长度
+  - （注意由重复字符的情况，代码有时间再优化一下）
+
+```java
+class Solution {
+    private List<String> result = new LinkedList<>();
+
+    public String[] permutation(String s) {
+        if (s == null || s.length() == 0) {
+            return new String[]{};
+        }
+        boolean[] visited = new boolean[s.length()];
+        Set<String> set = new HashSet<>();
+        StringBuilder sb = new StringBuilder();
+        backtrack(s, visited, sb, set);
+        return listToArray(result);
+    }
+
+    private void backtrack(String s, boolean[] visited, StringBuilder sb, Set<String> set) {
+        if (sb.length() == s.length()) {
+            if (!set.contains(sb.toString())) {
+                set.add(sb.toString());
+                result.add(sb.toString());
+            }
+            return ;
+        }
+        for (int i = 0; i < s.length(); i++) {
+            if (visited[i]) {
+                continue;
+            }
+            sb.append(s.charAt(i));
+            visited[i] = true;
+            backtrack(s, visited, sb, set);
+            sb.deleteCharAt(sb.length() - 1);
+            visited[i] = false;
+        }
+    }
+
+    private String[] listToArray(List<String> list) {
+        String[] result = new String[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            result[i] = list.get(i);
+        }
+        return result;
+    }
+}
+```
+
+
+
+#### 最小的k个数
+
+- **题目**： 输入整数数组 `arr` ，找出其中最小的 `k` 个数。例如，输入4、5、1、6、2、7、3、8这8个数字，则最小的4个数字是1、2、3、4。
+- **思路**：
+  - 堆排序。把所有元素都加到大根堆里面，并维持堆的大小为K，那么最后剩下的k个数就是所要的结果。
+  - 快速排序。
+
+```java
+class Solution {
+    public int[] getLeastNumbers(int[] arr, int k) {
+        if (arr == null || arr.length == 0 || arr.length < k || k == 0) {
+            return new int[] {};
+        }
+        int[] result = new int[k];
+        PriorityQueue<Integer> heap = new PriorityQueue<>((o1, o2) -> o2 - o1);
+        for (int i : arr) {
+            if (heap.size() < k) {
+                heap.add(i);
+            } else if (heap.peek() > i) {
+                heap.poll();
+                heap.add(i);
+            }
+        }
+        for (int i = 0; i < k; i++) {
+            result[i] = heap.poll();
+        }
+        return result;
+    }
+}
+```
+
+```java
+class Solution {
+    public int[] getLeastNumbers(int[] arr, int k) {
+        if (arr == null || arr.length == 0 || k == 0 || k > arr.length) {
+            return new int[] {};
+        }
+        int start = 0;
+        int end = arr.length - 1;
+        int index = partition(arr, start, end);
+        while (index != k - 1) {
+            if (index > k - 1) {
+                end = index - 1;
+                index = partition(arr, start, end);
+            } else {
+                start = index + 1;
+                index = partition(arr, start, end);
+            }
+        }
+        int[] result = new int[k];
+        for (int i = 0; i < k; i++) {
+            result[i] = arr[i];
+        }
+        return result;
+    }
+
+    private int partition(int[] arr, int low, int high) {
+        int pivot = arr[low];
+        int i = low;
+        int j = high + 1;
+        while (true) {
+            while (++i < high && arr[i] < pivot);
+            while (--j > low && arr[j] > pivot);
+            if (i >= j) {
+                break;
+            }
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+        arr[low] = arr[j];
+        arr[j] = pivot;
+        return j;
+    }
+}
+```
+
+
+
+#### 数据流中的中位数
+
+- **题目**： 如何得到一个数据流中的中位数？如果从数据流中读出奇数个数值，那么中位数就是所有数值排序之后位于中间的数值。如果从数据流中读出偶数个数值，那么中位数就是所有数值排序之后中间两个数的平均值。
+- **思路**： 用一个大根堆保存较小的那一半，用另外一个小根堆保存较大的那一半。因此中位数只需要根据奇偶数来选取堆顶元素即可。
+
+```java
+class MedianFinder {
+
+    private PriorityQueue<Integer> minHeap;
+    private PriorityQueue<Integer> maxHeap;
+    private Integer total;
+    /** initialize your data structure here. */
+    public MedianFinder() {
+        minHeap = new PriorityQueue<>();
+        maxHeap = new PriorityQueue<>((o1, o2) -> o2 - o1);
+        total = 0;
+    }
+    
+    public void addNum(int num) {
+        if (total % 2 == 0) {
+            maxHeap.add(num);
+            minHeap.add(maxHeap.poll());
+        } else {
+            minHeap.add(num);
+            maxHeap.add(minHeap.poll());
+        }
+        total++;
+    }
+    
+    public double findMedian() {
+        if (total == 0) {
+            return 0.0;
+        }
+        if (total % 2 == 1) {
+            return minHeap.peek();
+        }
+        return (minHeap.peek() + maxHeap.peek()) / 2.0;
+    }
+}
+```
+
+
+
+
+
