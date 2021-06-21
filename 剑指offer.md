@@ -1447,5 +1447,466 @@ class MedianFinder {
 
 
 
+#### 连续子数组的最大和
 
+- **题目**： 输入一个整型数组，数组中的一个或连续多个整数组成一个子数组。求所有子数组的和的最大值。
+
+  要求时间复杂度为O(n)。
+
+- **思路**： 动态规划。设`F(i)`为数组中以`i`结尾的子数组的最大和，则 `F(i) = max(F(i - 1) + cur, cur)` .
+
+```java
+class Solution {
+    public int maxSubArray(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        int result = nums[0];
+        int curMax = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            curMax = Math.max(curMax + nums[i], nums[i]);
+            result = Math.max(result, curMax);
+        }
+        return result;
+    }
+}
+```
+
+
+
+#### 把数组排成最小的数
+
+- **题目**： 输入一个非负整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数字中最小的一个。例如， 输入： `[3, 30, 34, 5, 9]` ，输出 `"3033459"`.
+- **思路**： heap。将所有数字转为字符串，然后加入小根堆中，再依次poll出来即可。所以问题的关键在于**比较器** 。如果两个字符串前面一些数字不等（比如：123 和 1278），那很好比较，但是存在第一个字符串是第二个字符串的子集的情况（比如：234 和  2342或2345），这个时候比较大小的时候就需要遍历完某个字符串之后再遍历一遍。（即比较 234 **234** 和 2342**2342**）
+
+```java
+class Solution {
+    public String minNumber(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return null;
+        }
+        PriorityQueue<String> heap = new PriorityQueue<>(new Comparator<String>() {
+            public int compare(String o1, String o2) {
+                int len1 = o1.length();
+                int len2 = o2.length();
+                int i = 0;
+                int j = 0;
+                while (i != len1 && j != len2) {
+                    if (o1.charAt(i) > o2.charAt(j)) {
+                        return 1;
+                    } else if (o1.charAt(i) < o2.charAt(j)) {
+                        return -1;
+                    }
+                    i++;
+                    j++;
+                    if (i == len1 && j != len2) {
+                        i = 0;
+                    }
+                    if (i != len1 && j == len2) {
+                        j = 0;
+                    }
+                }
+                return 0;
+            }
+        });
+        for (int i : nums) {
+            heap.add(String.valueOf(i));
+        }
+        StringBuilder sb = new StringBuilder();
+        while (!heap.isEmpty()) {
+            sb.append(heap.poll());
+        }
+        return sb.toString();
+    }
+}
+```
+
+
+
+#### 第一个只出现一个的字符
+
+- **题目**： 在字符串 s 中找出第一个只出现一次的字符。如果没有，返回一个单空格。 s 只包含小写字母。
+- **思路**： 略。
+
+```java
+class Solution {
+    public char firstUniqChar(String s) {
+        if (s == null || s.length() == 0) {
+            return ' ';
+        }
+        Queue<Character> queue = new LinkedList<>();
+        Map<Character, Integer> map = new HashMap<>();
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            int times = map.getOrDefault(ch, 0);
+            if (times == 0) {
+                queue.add(ch);
+            }
+            map.put(ch, times + 1);
+        }
+        while (!queue.isEmpty()) {
+            char ch = queue.poll();
+            if (map.get(ch) == 1) {
+                return ch;
+            }
+        }
+        return ' ';
+    }
+}
+```
+
+
+
+#### 数组中数字出现的次数
+
+- **题目**： 一个整型数组 `nums` 里除两个数字之外，其他数字都出现了两次。请写程序找出这两个只出现一次的数字。要求时间复杂度是O(n)，空间复杂度是O(1)。
+- **思路**： 异或。将数组中所有的数字都进行异或操作，得到的结果就是两个只出现一次的数字的异或值。由于该两个数字不同，因此必定存在某个bit (一个是0一个是1) 使得异或值的某个bit值为1。只要将该bit不同的值分为两个部分，然后分别异或即可得到最终的结果。
+
+```java
+class Solution {
+    public int[] singleNumbers(int[] nums) {
+        int temp = 0;
+        for (int i : nums) {
+            temp ^= i;
+        }
+        int index = 1;
+        while ((temp & index) == 0) {
+            index <<= 1;
+        }
+        int num1 = 0;
+        int num2 = 0;
+        for (int i : nums) {
+            if ((i & index) == 0) {
+                num1 ^= i;
+            } else {
+                num2 ^= i;
+            }
+        }
+        return new int[] {num1, num2};
+    }
+}
+```
+
+
+
+#### 在排序数组中查找数字
+
+- **题目**： 统计一个数字在排序数组中出现的次数。
+- **思路**： 二分查找。要统计某个数出现的次数，只要找到第一个和最后一个即可。查找第一个数稍微修改一下二分查找即可，最后一个可以通过查找target + 1 来实现。
+
+```java
+class Solution {
+    public int search(int[] nums, int target) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        int first = findFirst(nums, target);
+        if (nums[first] != target) {
+            return 0;
+        }
+        int last = findFirst(nums, target + 1);
+        return nums[first] == nums[last] ? last - first + 1 : last - first;
+    }
+
+    private int findFirst(int[] nums, int target) {
+        int low = 0; 
+        int high = nums.length - 1;
+        while (low < high) {
+            int mid = low + (high - low) / 2;
+            if (nums[mid] < target) {
+                low = mid + 1;
+            } else if (nums[mid] > target) {
+                high = mid - 1;
+            } else {
+                high = mid;
+            }
+        }
+        return low;
+    }
+}
+```
+
+
+
+#### 和为S的两个数字
+
+- **题目**： 输入一个递增排序的数组和一个数字s，在数组中查找两个数，使得它们的和正好是s。如果有多对数字的和等于s，则输出任意一对即可。
+- **思路**： 二分。
+
+```java
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        if (nums == null || nums.length < 2) {
+            return null;
+        }
+        int low = 0;
+        int high = nums.length - 1;
+        while (low < high) {
+            if (nums[low] + nums[high] == target) {
+                return new int[] {nums[low], nums[high]};
+            } else if (nums[low] + nums[high] > target) {
+                high--;
+            } else {
+                low++;
+            }
+        }
+        return null;
+    }
+}
+```
+
+
+
+#### 滑动窗口的最大值
+
+- **题目**： 给定一个数组 `nums` 和滑动窗口的大小 `k`，请找出所有滑动窗口里的最大值。
+- **思路**： 双向队列。用一个单调的双向队列来保存滑动窗口中可能的最大值。双向队列的头元素保存当前窗口的最大值。对于下一个加进来的元素，将其与队列中的元素从尾到头比较一遍，将小于当前元素的值全部删除，只保留可能成为最大值的元素。
+
+```java
+class Solution {
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        if (nums == null || nums.length == 0 || nums.length < k) {
+            return new int[] {};
+        }
+        int[] result = new int[nums.length - k + 1];
+        Deque<Integer> deque = new LinkedList<>();
+        for (int i = 0; i < nums.length; i++) {
+            while (!deque.isEmpty() && nums[deque.getLast()] <= nums[i]) {
+                deque.removeLast();
+            }
+            if (!deque.isEmpty() && deque.getFirst() < i - k + 1) {
+                deque.removeFirst();
+            }
+            deque.add(i);
+            if (i >= k - 1) {
+                result[i - k + 1] = nums[deque.getFirst()];
+            }
+        }
+        return result;
+    }
+}
+```
+
+
+
+#### 两个链表的第一个公共节点
+
+- **题目**： 输入两个链表，找出它们的第一个公共节点。
+- **思路**： A链表走完自己的路再走B，B链表走完自己的路再走A的路。如果有公共节点，那么肯定会在第一个公共节点相遇，因为两个链表所走的路程是一样的。如果没有公共节点，那么都会以null结束。
+
+```java
+public class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        ListNode curA = headA;
+        ListNode curB = headB;
+        while (curA != curB) {
+            curA = curA == null ? headB : curA.next;
+            curB = curB == null ? headA : curB.next;
+        }
+        return curA;
+    }
+}
+```
+
+
+
+#### 二叉树的深度
+
+- **题目**： 输入一棵二叉树的根节点，求该树的深度。从根节点到叶节点依次经过的节点（含根、叶节点）形成树的一条路径，最长路径的长度为树的深度。
+- **思路**： 二叉树的深度等于根节点加上最大子树的高度。
+
+```java
+class Solution {
+    public int maxDepth(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
+    }
+}
+```
+
+
+
+#### 0 ~ n - 1中缺失的数字
+
+- **题目**： 一个长度为n-1的递增排序数组中的所有数字都是唯一的，并且每个数字都在范围0～n-1之内。在范围0～n-1内的n个数字中有且只有一个数字不在该数组中，请找出这个数字。
+- **思路**： 二分。如果`nums[i] = i ` ，那么就说明 i 前面的所有数都是存在的，那么就在后面去找，直到找到最左边那个 `nums[i] != i`的数。
+
+```java
+class Solution {
+    public int missingNumber(int[] nums) {
+        if(nums == null || nums.length == 0) {
+            return -1;
+        }
+        int low = 0;
+        int high = nums.length - 1;
+        while (low < high) {
+            int mid = low + (high - low) / 2;
+            if (nums[mid] == mid) {
+                low = mid + 1;
+            } else if (nums[mid] > mid) {
+                high = mid;
+            } else {
+                return -1;
+            }
+        }
+        return low == nums[low] ? nums.length : low;
+    }
+}
+```
+
+
+
+#### 二叉搜索树的第K大节点
+
+- **题目**： 给定一棵二叉搜索树，请找出其中第k大的节点。
+- **思路**： 最简单的就是中序遍历一遍，将结果放在一个数组中，然后返回倒数第K个。更好的方法是参考中序遍历的做法，依照  **右子树 **->  **根节点**  -> **左子树** 的顺序遍历一遍，到达第K个返回即可。
+
+```java
+class Solution {
+    private int result = -1;
+    private int count = 0;
+
+    public int kthLargest(TreeNode root, int k) {
+        inorder(root, k);
+        return result;
+    }
+
+    private void inorder(TreeNode root, int k) {
+        if (root == null) {
+            return ;
+        }
+        inorder(root.right, k);
+        if (++count == k) {
+            result = root.val;
+            return ;
+        }
+        inorder(root.left, k);
+    }
+}
+```
+
+
+
+#### 数组中的逆序对
+
+- **题目**： 在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对。输入一个数组，求出这个数组中的逆序对的总数。例如：输入：`[7, 5, 6, 4]`，输出5.
+- **思路**： 最简单的方法就是两层for循环暴力解决，但是时间复杂度为`O(n^2)`，会超时。如果数组可以分成两半有序的数组，那么求这两个数组之间的逆序对个数将会简单很多。因此可以利用归并排序的思想，将数组的两半分别排序并计算子数组内逆序对的个数，那么总逆序对个数就等于两个子数组内部的逆序对个数加上它们之间的逆序对个数。为了方便计算，排序为倒序。
+
+```java
+class Solution {
+    private int result = 0;
+    private int[] arr;
+
+    public int reversePairs(int[] nums) {
+        if (nums == null || nums.length < 2) {
+            return result;
+        }
+        arr = new int[nums.length];
+        reversePairs(nums, 0, nums.length - 1);
+        return result;
+    }
+
+    private void reversePairs(int[] nums, int low, int high) {
+        if (low >= high) {
+            return ;
+        }
+        int mid = low + (high - low) / 2;
+        reversePairs(nums, low, mid);
+        reversePairs(nums, mid + 1, high);
+        merge(nums, low, mid, high);
+    }
+
+    private void merge(int[] nums, int low, int mid, int high) {
+        int start1 = low, end1 = mid;
+        int start2 = mid + 1, end2 = high;
+        int cur = low;
+        while (start1 <= end1 && start2 <= end2) {
+            if (nums[start1] > nums[start2]) {
+                result += end2 - start2 + 1;
+                arr[cur] = nums[start1++];
+            } else {
+                arr[cur] = nums[start2++];
+            }
+            cur++;
+        }
+        while (start1 <= end1) {
+            arr[cur++] = nums[start1++];
+        }
+        while (start2 <= end2) {
+            arr[cur++] = nums[start2++];
+        }
+        for (int i = low; i <= high; i++) {
+            nums[i] = arr[i];
+        }
+    }
+}
+```
+
+
+
+#### 扑克牌中的顺子
+
+- **题目**：从扑克牌中随机抽5张牌，判断是不是一个顺子，即这5张牌是不是连续的。2～10为数字本身，A为1，J为11，Q为12，K为13，而大、小王为 0 ，可以看成任意数字。A 不能视为 14。例如：输入`[1, 2, 3, 4, 5]`或者`[0, 0, 1, 2, 5]`，则返回true。
+- **思路**：
+  1. 将数组排序，然后统计0的个数，然后再判断所有非0的元素两两之间的差的总和是否大于0的个数，如果大于，则false，否则true。
+  2. 如果又重复，直接返回false。然后判断非0的元素中最大值和最小值之间的差小于5即可。（0直接略过）。
+
+```java
+class Solution {
+    public boolean isStraight(int[] nums) {
+        if (nums == null || nums.length != 5) {
+            return false;
+        }
+        Arrays.sort(nums);
+        int index = 0;
+        int numOfZero = 0;
+        while (index < nums.length - 1) {
+            if (nums[index] == 0) {
+                numOfZero++;
+                index++;
+                continue;
+            }
+            if (nums[index + 1] == nums[index]) {
+                return false;
+            }
+            int diff = nums[index + 1] - nums[index] - 1;
+            if (diff > numOfZero) {
+                return false;
+            }
+            numOfZero -= diff;
+            index++;
+        }
+        return true;
+    }
+}
+```
+
+
+
+```java
+class Solution {
+    public boolean isStraight(int[] nums) {
+        if (nums == null || nums.length != 5) {
+            return false;
+        }
+        Set<Integer> set = new HashSet<>();
+        int max = Integer.MIN_VALUE;
+        int min = Integer.MAX_VALUE;
+        for (int i : nums) {
+            if (i == 0) {
+                continue;
+            }
+            if (set.contains(i)) {
+                return false;
+            }
+            set.add(i);
+            max = Math.max(i, max);
+            min = Math.min(i, min);
+        }
+        return max - min < 5;
+    }
+}
+```
 
